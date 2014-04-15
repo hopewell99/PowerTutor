@@ -20,6 +20,7 @@ Please send inquiries to powertutor@umich.edu
 package edu.umich.PowerTutor.ui;
 
 import edu.umich.PowerTutor.R;
+import edu.umich.PowerTutor.components.PowerProfiler;
 import edu.umich.PowerTutor.phone.PhoneSelector;
 import edu.umich.PowerTutor.service.ICounterService;
 import edu.umich.PowerTutor.service.PowerEstimator;
@@ -135,8 +136,11 @@ public class MiscView extends Activity {
     }
   }
 
+
+  PowerProfiler mPowerProfiler = null;
+
   class CounterServiceConnection implements ServiceConnection {
-    public void onServiceConnected(ComponentName className, 
+    public void onServiceConnected(ComponentName className,
                                    IBinder boundService ) {
       counterService = ICounterService.Stub.asInterface((IBinder)boundService);
       try {
@@ -288,6 +292,11 @@ public class MiscView extends Activity {
     }
 
     public void setupView() {
+      try {
+        double displayPower = PowerProfiler.getInstance(getApplicationContext()).getDisplayPower();
+      } catch (Exception e) {
+        Log.d("brightness Exception", e.getMessage());
+      }
       if(txt == null) return;
       if(counterService != null) try {
         // Compute what we're going to call the temporal power usage.
@@ -344,7 +353,7 @@ public class MiscView extends Activity {
         if(means != null) for(long p : means) {
           power += p / 1000.0;
         }
-        
+
         if(power > 0) {
           double charge = batteryStats.getCharge();
           double volt = batteryStats.getVoltage();
@@ -418,7 +427,7 @@ public class MiscView extends Activity {
       title.setText("User ID");
       summary.setText("User ID for " + SystemInfo.getInstance().getUidName(uid,
                       getApplicationContext().getPackageManager()));
-                        
+
     }
   }
 
